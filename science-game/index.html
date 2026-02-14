@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1920, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Science Game - Grade 3</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/animations.css">
+</head>
+<body>
+  <!-- ========== SPLASH SCREEN ========== -->
+  <div id="screen-splash" class="screen active">
+    <div class="splash-bg">
+      <div class="stars-container" id="stars-container"></div>
+      <div class="splash-content">
+        <div class="splash-icon">
+          <svg viewBox="0 0 120 120" class="atom-icon">
+            <ellipse cx="60" cy="60" rx="50" ry="20" class="orbit orbit-1"/>
+            <ellipse cx="60" cy="60" rx="50" ry="20" class="orbit orbit-2"/>
+            <ellipse cx="60" cy="60" rx="50" ry="20" class="orbit orbit-3"/>
+            <circle cx="60" cy="60" r="12" class="nucleus"/>
+            <circle cx="110" cy="60" r="5" class="electron electron-1"/>
+            <circle cx="35" cy="17" r="5" class="electron electron-2"/>
+            <circle cx="35" cy="103" r="5" class="electron electron-3"/>
+          </svg>
+        </div>
+        <h1 class="splash-title">Science Game</h1>
+        <p class="splash-subtitle">Grade 3 - Explore & Learn!</p>
+        <div class="loading-bar">
+          <div class="loading-fill" id="loading-fill"></div>
+        </div>
+        <p class="splash-hint">Loading your adventure...</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== MAIN MENU ========== -->
+  <div id="screen-menu" class="screen">
+    <div class="menu-bg">
+      <div class="particles" id="menu-particles"></div>
+      <div class="menu-header">
+        <div class="menu-logo">
+          <svg viewBox="0 0 80 80" class="atom-icon-sm">
+            <ellipse cx="40" cy="40" rx="32" ry="12" class="orbit orbit-1"/>
+            <ellipse cx="40" cy="40" rx="32" ry="12" class="orbit orbit-2"/>
+            <ellipse cx="40" cy="40" rx="32" ry="12" class="orbit orbit-3"/>
+            <circle cx="40" cy="40" r="8" class="nucleus"/>
+          </svg>
+        </div>
+        <h1>Science Game</h1>
+        <div class="player-info">
+          <div class="player-avatar" id="player-avatar">
+            <svg viewBox="0 0 40 40">
+              <circle cx="20" cy="15" r="8" fill="#FFD93D"/>
+              <path d="M6 35 Q6 24 20 24 Q34 24 34 35" fill="#FFD93D"/>
+            </svg>
+          </div>
+          <span id="player-name">Explorer</span>
+          <div class="score-badge">
+            <svg viewBox="0 0 24 24" width="20" height="20">
+              <polygon points="12,2 15,9 22,9 16,14 18,21 12,17 6,21 8,14 2,9 9,9" fill="#FFD93D"/>
+            </svg>
+            <span id="menu-total-stars">0</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="menu-grid" id="menu-grid">
+        <!-- Topic Card: States of Matter -->
+        <div class="topic-card focusable" data-topic="matter" data-nav-row="0" data-nav-col="0" tabindex="0">
+          <div class="card-glow"></div>
+          <div class="card-icon">
+            <svg viewBox="0 0 80 80">
+              <rect x="15" y="45" width="22" height="22" rx="2" fill="#4FC3F7" opacity="0.9"/>
+              <circle cx="55" cy="30" r="12" fill="#4FC3F7" opacity="0.6"/>
+              <circle cx="50" cy="55" r="4" fill="#4FC3F7" opacity="0.3"/>
+              <circle cx="60" cy="50" r="3" fill="#4FC3F7" opacity="0.3"/>
+              <circle cx="55" cy="60" r="3.5" fill="#4FC3F7" opacity="0.3"/>
+            </svg>
+          </div>
+          <h3>States of Matter</h3>
+          <p>Solid, Liquid & Gas</p>
+          <div class="card-stars" id="stars-matter">
+            <span class="star empty"></span><span class="star empty"></span><span class="star empty"></span>
+          </div>
+          <div class="card-badge">10 Questions</div>
+        </div>
+
+        <!-- Topic Card: Solar System -->
+        <div class="topic-card focusable" data-topic="solar" data-nav-row="0" data-nav-col="1" tabindex="0">
+          <div class="card-glow"></div>
+          <div class="card-icon">
+            <svg viewBox="0 0 80 80">
+              <circle cx="40" cy="40" r="14" fill="#FFD93D"/>
+              <circle cx="40" cy="40" r="22" fill="none" stroke="#FFD93D" stroke-width="1" opacity="0.4"/>
+              <circle cx="62" cy="40" r="4" fill="#4FC3F7"/>
+              <circle cx="40" cy="40" r="30" fill="none" stroke="#FFD93D" stroke-width="1" opacity="0.3"/>
+              <circle cx="40" cy="10" r="3" fill="#FF7043"/>
+            </svg>
+          </div>
+          <h3>Solar System</h3>
+          <p>Planets & Stars</p>
+          <div class="card-stars" id="stars-solar">
+            <span class="star empty"></span><span class="star empty"></span><span class="star empty"></span>
+          </div>
+          <div class="card-badge">10 Questions</div>
+        </div>
+
+        <!-- Topic Card: Plants -->
+        <div class="topic-card focusable" data-topic="plants" data-nav-row="0" data-nav-col="2" tabindex="0">
+          <div class="card-glow"></div>
+          <div class="card-icon">
+            <svg viewBox="0 0 80 80">
+              <rect x="37" y="40" width="6" height="25" rx="2" fill="#66BB6A"/>
+              <ellipse cx="40" cy="32" rx="16" ry="14" fill="#66BB6A"/>
+              <ellipse cx="30" cy="36" rx="10" ry="8" fill="#81C784"/>
+              <ellipse cx="50" cy="36" rx="10" ry="8" fill="#81C784"/>
+              <circle cx="40" cy="28" r="4" fill="#FFEE58"/>
+            </svg>
+          </div>
+          <h3>Plant Life</h3>
+          <p>Seeds to Trees</p>
+          <div class="card-stars" id="stars-plants">
+            <span class="star empty"></span><span class="star empty"></span><span class="star empty"></span>
+          </div>
+          <div class="card-badge">10 Questions</div>
+        </div>
+
+        <!-- Topic Card: Animals -->
+        <div class="topic-card focusable" data-topic="animals" data-nav-row="1" data-nav-col="0" tabindex="0">
+          <div class="card-glow"></div>
+          <div class="card-icon">
+            <svg viewBox="0 0 80 80">
+              <ellipse cx="40" cy="45" rx="18" ry="14" fill="#FF8A65"/>
+              <circle cx="32" cy="32" r="8" fill="#FF8A65"/>
+              <circle cx="48" cy="32" r="8" fill="#FF8A65"/>
+              <circle cx="32" cy="30" r="3" fill="#FFF"/>
+              <circle cx="48" cy="30" r="3" fill="#FFF"/>
+              <circle cx="32" cy="31" r="1.5" fill="#333"/>
+              <circle cx="48" cy="31" r="1.5" fill="#333"/>
+              <ellipse cx="40" cy="38" rx="4" ry="3" fill="#FF7043"/>
+            </svg>
+          </div>
+          <h3>Animals</h3>
+          <p>Habitats & Groups</p>
+          <div class="card-stars" id="stars-animals">
+            <span class="star empty"></span><span class="star empty"></span><span class="star empty"></span>
+          </div>
+          <div class="card-badge">10 Questions</div>
+        </div>
+
+        <!-- Topic Card: Human Body -->
+        <div class="topic-card focusable" data-topic="body" data-nav-row="1" data-nav-col="1" tabindex="0">
+          <div class="card-glow"></div>
+          <div class="card-icon">
+            <svg viewBox="0 0 80 80">
+              <circle cx="40" cy="22" r="10" fill="#EF9A9A"/>
+              <rect x="32" y="32" width="16" height="22" rx="4" fill="#EF9A9A"/>
+              <rect x="22" y="34" width="10" height="4" rx="2" fill="#EF9A9A"/>
+              <rect x="48" y="34" width="10" height="4" rx="2" fill="#EF9A9A"/>
+              <rect x="34" y="54" width="5" height="14" rx="2" fill="#EF9A9A"/>
+              <rect x="41" y="54" width="5" height="14" rx="2" fill="#EF9A9A"/>
+            </svg>
+          </div>
+          <h3>Human Body</h3>
+          <p>Bones & Organs</p>
+          <div class="card-stars" id="stars-body">
+            <span class="star empty"></span><span class="star empty"></span><span class="star empty"></span>
+          </div>
+          <div class="card-badge">10 Questions</div>
+        </div>
+
+        <!-- Topic Card: Weather -->
+        <div class="topic-card focusable" data-topic="weather" data-nav-row="1" data-nav-col="2" tabindex="0">
+          <div class="card-glow"></div>
+          <div class="card-icon">
+            <svg viewBox="0 0 80 80">
+              <circle cx="36" cy="32" r="14" fill="#FFD93D"/>
+              <path d="M50 42 Q58 30 66 42 Q74 30 74 42 Q74 54 62 54 L46 54 Q38 54 38 46 Q38 38 50 42Z" fill="#B0BEC5"/>
+              <line x1="44" y1="58" x2="44" y2="68" stroke="#4FC3F7" stroke-width="2" stroke-linecap="round"/>
+              <line x1="52" y1="58" x2="52" y2="66" stroke="#4FC3F7" stroke-width="2" stroke-linecap="round"/>
+              <line x1="60" y1="58" x2="60" y2="70" stroke="#4FC3F7" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <h3>Weather</h3>
+          <p>Sun, Rain & Wind</p>
+          <div class="card-stars" id="stars-weather">
+            <span class="star empty"></span><span class="star empty"></span><span class="star empty"></span>
+          </div>
+          <div class="card-badge">10 Questions</div>
+        </div>
+      </div>
+
+      <div class="menu-footer">
+        <div class="control-hint">
+          <span class="key-icon">&#9664; &#9654; &#9650; &#9660;</span> Navigate
+          <span class="key-icon spacer">OK</span> Select
+          <span class="key-icon spacer">BACK</span> Exit
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== GAME SCREEN ========== -->
+  <div id="screen-game" class="screen">
+    <div class="game-bg">
+      <!-- Top Bar -->
+      <div class="game-topbar">
+        <div class="topbar-left">
+          <button class="btn-back focusable" id="btn-back" data-nav-row="0" data-nav-col="0" tabindex="0">
+            <svg viewBox="0 0 24 24" width="24" height="24">
+              <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" fill="currentColor"/>
+            </svg>
+            Back
+          </button>
+          <h2 id="game-topic-title">States of Matter</h2>
+        </div>
+        <div class="topbar-right">
+          <div class="progress-container">
+            <div class="progress-bar">
+              <div class="progress-fill" id="progress-fill"></div>
+            </div>
+            <span id="progress-text">1/10</span>
+          </div>
+          <div class="score-display">
+            <svg viewBox="0 0 24 24" width="22" height="22">
+              <polygon points="12,2 15,9 22,9 16,14 18,21 12,17 6,21 8,14 2,9 9,9" fill="#FFD93D"/>
+            </svg>
+            <span id="game-score">0</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Question Area -->
+      <div class="question-area">
+        <div class="question-card" id="question-card">
+          <div class="question-number" id="question-number">Question 1</div>
+          <div class="question-text" id="question-text">Loading question...</div>
+          <div class="question-hint" id="question-hint"></div>
+        </div>
+
+        <!-- Visual Aid Area -->
+        <div class="visual-aid" id="visual-aid"></div>
+      </div>
+
+      <!-- Answer Options -->
+      <div class="answers-grid" id="answers-grid">
+        <button class="answer-btn focusable" data-answer="0" data-nav-row="2" data-nav-col="0" tabindex="0">
+          <span class="answer-letter">A</span>
+          <span class="answer-text" id="answer-0">Answer A</span>
+          <span class="answer-icon"></span>
+        </button>
+        <button class="answer-btn focusable" data-answer="1" data-nav-row="2" data-nav-col="1" tabindex="0">
+          <span class="answer-letter">B</span>
+          <span class="answer-text" id="answer-1">Answer B</span>
+          <span class="answer-icon"></span>
+        </button>
+        <button class="answer-btn focusable" data-answer="2" data-nav-row="3" data-nav-col="0" tabindex="0">
+          <span class="answer-letter">C</span>
+          <span class="answer-text" id="answer-2">Answer C</span>
+          <span class="answer-icon"></span>
+        </button>
+        <button class="answer-btn focusable" data-answer="3" data-nav-row="3" data-nav-col="1" tabindex="0">
+          <span class="answer-letter">D</span>
+          <span class="answer-text" id="answer-3">Answer D</span>
+          <span class="answer-icon"></span>
+        </button>
+      </div>
+
+      <!-- Feedback Overlay -->
+      <div class="feedback-overlay" id="feedback-overlay">
+        <div class="feedback-content" id="feedback-content">
+          <div class="feedback-icon" id="feedback-icon"></div>
+          <h2 id="feedback-title">Correct!</h2>
+          <p id="feedback-text">Great job!</p>
+          <div class="feedback-points" id="feedback-points">+10</div>
+        </div>
+      </div>
+
+      <!-- Timer -->
+      <div class="timer-ring" id="timer-ring">
+        <svg viewBox="0 0 60 60">
+          <circle cx="30" cy="30" r="26" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="4"/>
+          <circle cx="30" cy="30" r="26" fill="none" stroke="#4FC3F7" stroke-width="4"
+            stroke-dasharray="163.36" stroke-dashoffset="0" id="timer-circle"
+            stroke-linecap="round" transform="rotate(-90 30 30)"/>
+        </svg>
+        <span id="timer-text">15</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== RESULTS SCREEN ========== -->
+  <div id="screen-results" class="screen">
+    <div class="results-bg">
+      <div class="confetti-container" id="confetti-container"></div>
+      <div class="results-content">
+        <div class="results-trophy" id="results-trophy">
+          <svg viewBox="0 0 120 140">
+            <path d="M35 20 h50 v10 q0 40 -25 55 q-25 -15 -25 -55 z" fill="#FFD93D"/>
+            <rect x="45" y="85" width="30" height="8" rx="2" fill="#FFC107"/>
+            <rect x="40" y="93" width="40" height="6" rx="3" fill="#FFD93D"/>
+            <path d="M35 20 h-15 q-5 0 -5 10 v10 q0 15 20 20" fill="none" stroke="#FFD93D" stroke-width="6" stroke-linecap="round"/>
+            <path d="M85 20 h15 q5 0 5 10 v10 q0 15 -20 20" fill="none" stroke="#FFD93D" stroke-width="6" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <h1 id="results-title">Amazing!</h1>
+        <p id="results-subtitle">You completed States of Matter</p>
+
+        <div class="results-stats">
+          <div class="stat-card">
+            <div class="stat-value" id="results-score">0</div>
+            <div class="stat-label">Points</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="results-correct">0/10</div>
+            <div class="stat-label">Correct</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="results-time">0s</div>
+            <div class="stat-label">Avg Time</div>
+          </div>
+        </div>
+
+        <div class="results-stars" id="results-stars">
+          <span class="result-star"></span>
+          <span class="result-star"></span>
+          <span class="result-star"></span>
+        </div>
+
+        <div class="results-buttons">
+          <button class="btn-primary focusable" id="btn-retry" data-nav-row="0" data-nav-col="0" tabindex="0">
+            <svg viewBox="0 0 24 24" width="22" height="22">
+              <path d="M17.65 6.35A7.96 7.96 0 0012 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0112 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z" fill="currentColor"/>
+            </svg>
+            Try Again
+          </button>
+          <button class="btn-secondary focusable" id="btn-menu" data-nav-row="0" data-nav-col="1" tabindex="0">
+            <svg viewBox="0 0 24 24" width="22" height="22">
+              <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z" fill="currentColor"/>
+            </svg>
+            Main Menu
+          </button>
+        </div>
+
+        <div class="control-hint" style="margin-top:40px">
+          <span class="key-icon">&#9664; &#9654;</span> Navigate
+          <span class="key-icon spacer">OK</span> Select
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/questions.js"></script>
+  <script src="js/sounds.js"></script>
+  <script src="js/navigation.js"></script>
+  <script src="js/game.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

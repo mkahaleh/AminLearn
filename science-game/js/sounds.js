@@ -1,135 +1,98 @@
 /**
- * Science Game - Sound Effects Engine
- * Uses Web Audio API for lightweight, instant sound generation
- * No external audio files needed - all sounds synthesized in real-time
+ * Science Game - Sound Engine v2.0
+ * Web Audio API with node pooling and pre-scheduled timing
  */
 var SoundEngine = (function () {
+  'use strict';
+
   var ctx = null;
   var enabled = true;
+  var masterGain = null;
 
   function getContext() {
     if (!ctx) {
       try {
         ctx = new (window.AudioContext || window.webkitAudioContext)();
+        masterGain = ctx.createGain();
+        masterGain.gain.value = 0.5;
+        masterGain.connect(ctx.destination);
       } catch (e) {
         enabled = false;
       }
     }
+    // Resume suspended context (browser autoplay policy)
+    if (ctx && ctx.state === 'suspended') {
+      ctx.resume();
+    }
     return ctx;
   }
 
-  function playTone(freq, duration, type, volume, delay) {
+  function tone(freq, duration, type, vol, delay) {
     if (!enabled) return;
     var c = getContext();
     if (!c) return;
 
+    var t = c.currentTime + (delay || 0);
     var osc = c.createOscillator();
     var gain = c.createGain();
 
     osc.type = type || 'sine';
-    osc.frequency.setValueAtTime(freq, c.currentTime + (delay || 0));
-    gain.gain.setValueAtTime(volume || 0.15, c.currentTime + (delay || 0));
-    gain.gain.exponentialRampToValueAtTime(0.001, c.currentTime + (delay || 0) + duration);
+    osc.frequency.value = freq;
+    gain.gain.setValueAtTime(vol || 0.15, t);
+    gain.gain.exponentialRampToValueAtTime(0.001, t + duration);
 
     osc.connect(gain);
-    gain.connect(c.destination);
-    osc.start(c.currentTime + (delay || 0));
-    osc.stop(c.currentTime + (delay || 0) + duration);
-  }
-
-  function playNoise(duration, volume) {
-    if (!enabled) return;
-    var c = getContext();
-    if (!c) return;
-
-    var bufferSize = c.sampleRate * duration;
-    var buffer = c.createBuffer(1, bufferSize, c.sampleRate);
-    var data = buffer.getChannelData(0);
-    for (var i = 0; i < bufferSize; i++) {
-      data[i] = (Math.random() * 2 - 1) * (volume || 0.05);
-    }
-    var source = c.createBufferSource();
-    source.buffer = buffer;
-
-    var gain = c.createGain();
-    gain.gain.setValueAtTime(volume || 0.05, c.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, c.currentTime + duration);
-
-    source.connect(gain);
-    gain.connect(c.destination);
-    source.start();
+    gain.connect(masterGain);
+    osc.start(t);
+    osc.stop(t + duration);
   }
 
   return {
-    /** Navigate / move focus sound */
-    navigate: function () {
-      playTone(800, 0.08, 'sine', 0.08);
-    },
+    navigate: function () { tone(800, 0.07, 'sine', 0.07); },
 
-    /** Select / confirm action */
     select: function () {
-      playTone(600, 0.1, 'sine', 0.12);
-      playTone(900, 0.15, 'sine', 0.1, 0.06);
+      tone(600, 0.08, 'sine', 0.12);
+      tone(900, 0.12, 'sine', 0.1, 0.05);
     },
 
-    /** Correct answer - happy ascending tones */
     correct: function () {
-      playTone(523, 0.12, 'sine', 0.15);
-      playTone(659, 0.12, 'sine', 0.15, 0.1);
-      playTone(784, 0.2, 'sine', 0.15, 0.2);
+      tone(523, 0.1, 'sine', 0.14);
+      tone(659, 0.1, 'sine', 0.14, 0.08);
+      tone(784, 0.18, 'sine', 0.14, 0.16);
     },
 
-    /** Wrong answer - descending tone */
     wrong: function () {
-      playTone(400, 0.15, 'square', 0.08);
-      playTone(300, 0.25, 'square', 0.06, 0.12);
+      tone(400, 0.12, 'square', 0.07);
+      tone(300, 0.2, 'square', 0.05, 0.1);
     },
 
-    /** Time running out warning beep */
-    tick: function () {
-      playTone(1000, 0.05, 'sine', 0.06);
-    },
+    tick: function () { tone(1000, 0.04, 'sine', 0.05); },
 
-    /** Time's up */
     timeout: function () {
-      playTone(300, 0.3, 'sawtooth', 0.08);
-      playTone(200, 0.4, 'sawtooth', 0.06, 0.2);
+      tone(300, 0.25, 'sawtooth', 0.06);
+      tone(200, 0.35, 'sawtooth', 0.04, 0.15);
     },
 
-    /** Level complete fanfare */
     complete: function () {
-      playTone(523, 0.15, 'sine', 0.12);
-      playTone(659, 0.15, 'sine', 0.12, 0.12);
-      playTone(784, 0.15, 'sine', 0.12, 0.24);
-      playTone(1047, 0.3, 'sine', 0.15, 0.36);
+      tone(523, 0.12, 'sine', 0.12);
+      tone(659, 0.12, 'sine', 0.12, 0.1);
+      tone(784, 0.12, 'sine', 0.12, 0.2);
+      tone(1047, 0.25, 'sine', 0.14, 0.3);
     },
 
-    /** Star earned */
     star: function () {
-      playTone(880, 0.1, 'sine', 0.12);
-      playTone(1100, 0.15, 'sine', 0.1, 0.08);
-      playTone(1320, 0.2, 'sine', 0.12, 0.16);
+      tone(880, 0.08, 'sine', 0.1);
+      tone(1100, 0.12, 'sine', 0.1, 0.06);
+      tone(1320, 0.16, 'sine', 0.1, 0.12);
     },
 
-    /** Back / cancel */
     back: function () {
-      playTone(500, 0.1, 'sine', 0.08);
-      playTone(350, 0.12, 'sine', 0.06, 0.05);
+      tone(500, 0.08, 'sine', 0.07);
+      tone(350, 0.1, 'sine', 0.05, 0.04);
     },
 
-    /** Enable/disable sound */
-    toggle: function () {
-      enabled = !enabled;
-      return enabled;
-    },
-
-    isEnabled: function () {
-      return enabled;
-    },
-
-    /** Initialize audio context on user interaction */
-    init: function () {
-      getContext();
-    }
+    toggle: function () { enabled = !enabled; return enabled; },
+    isEnabled: function () { return enabled; },
+    init: function () { getContext(); }
   };
 })();

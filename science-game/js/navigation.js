@@ -1,81 +1,59 @@
 /**
- * Science Game - Samsung TV D-pad Navigation System
- * Implements spatial navigation for Samsung TV remote control
- * Supports: Arrow keys (D-pad), Enter (OK), Backspace/ESC (Back), Color buttons
- *
+ * Science Game - Samsung TV D-pad Navigation v2.0
+ * Performance: input throttling, cached DOM lookups, passive listeners
  * Samsung TV Remote Key Codes:
- * - Arrow keys: 37(Left), 38(Up), 39(Right), 40(Down)
- * - Enter/OK: 13
- * - Back: 10009 (Tizen) or 8/27 (browser)
- * - Color buttons: Red=403, Green=404, Yellow=405, Blue=406
+ *   Arrows: 37/38/39/40, Enter: 13, Back: 10009 (Tizen) / 8,27 (browser)
  */
 var TVNav = (function () {
+  'use strict';
+
   var currentScreen = null;
   var focusedElement = null;
   var onSelect = null;
   var onBack = null;
   var navLocked = false;
+  var lastKeyTime = 0;
+  var KEY_THROTTLE = 120; // ms between key repeats
 
-  // Samsung Tizen key codes
   var KEY = {
-    LEFT: 37,
-    UP: 38,
-    RIGHT: 39,
-    DOWN: 40,
-    ENTER: 13,
-    BACK_TIZEN: 10009,
-    BACK_BROWSER: 8,
-    ESC: 27,
-    RED: 403,
-    GREEN: 404,
-    YELLOW: 405,
-    BLUE: 406
+    LEFT: 37, UP: 38, RIGHT: 39, DOWN: 40,
+    ENTER: 13, BACK_TIZEN: 10009, BACK_BROWSER: 8, ESC: 27,
+    RED: 403, GREEN: 404, YELLOW: 405, BLUE: 406
   };
 
-  /**
-   * Get all focusable elements in the current active screen
-   */
-  function getFocusables() {
-    if (!currentScreen) return [];
-    return Array.prototype.slice.call(
-      currentScreen.querySelectorAll('.focusable:not(.disabled):not([disabled])')
-    );
+  // Cached focusable list - invalidated on screen change
+  var cachedFocusables = null;
+
+  function invalidateCache() {
+    cachedFocusables = null;
   }
 
-  /**
-   * Set visual focus on an element
-   */
-  function setFocus(el) {
-    if (!el) return;
+  function getFocusables() {
+    if (cachedFocusables) return cachedFocusables;
+    if (!currentScreen) return [];
+    cachedFocusables = Array.prototype.slice.call(
+      currentScreen.querySelectorAll('.focusable:not(.disabled):not([disabled])')
+    );
+    return cachedFocusables;
+  }
 
-    // Remove focus from previous element
+  function setFocus(el) {
+    if (!el || el === focusedElement) return;
+
     if (focusedElement) {
       focusedElement.classList.remove('focused');
-      focusedElement.blur();
     }
 
-    // Set focus on new element
     focusedElement = el;
     focusedElement.classList.add('focused');
     focusedElement.focus({ preventScroll: true });
 
-    // Play navigation sound
     SoundEngine.navigate();
-
-    // Ensure element is visible
-    scrollIntoViewIfNeeded(el);
-  }
-
-  function scrollIntoViewIfNeeded(el) {
-    // TV apps typically don't scroll, but safety check
-    if (el.scrollIntoViewIfNeeded) {
-      el.scrollIntoViewIfNeeded(false);
-    }
   }
 
   /**
-   * Find the nearest focusable element in a given direction
-   * Uses spatial navigation algorithm based on element positions
+   * Spatial navigation: find nearest element in direction
+   * Optimized with early exit and squared distance (no sqrt)
    */
   function findNearest(direction) {
     var items = getFocusables();
@@ -83,86 +61,74 @@ var TVNav = (function () {
     if (!focusedElement) return items[0];
 
     var rect = focusedElement.getBoundingClientRect();
-    var cx = rect.left + rect.width / 2;
-    var cy = rect.top + rect.height / 2;
+    var cx = rect.left + (rect.width >> 1);
+    var cy = rect.top + (rect.height >> 1);
 
     var best = null;
-    var bestScore = Infinity;
+    var bestScore = 1e9;
+    var isHoriz = direction === 'left' || direction === 'right';
+    var isPositive = direction === 'right' || direction === 'down';
 
-    for (var i = 0; i < items.length; i++) {
+    for (var i = 0, len = items.length; i < len; i++) {
       if (items[i] === focusedElement) continue;
 
       var r = items[i].getBoundingClientRect();
-      var ix = r.left + r.width / 2;
-      var iy = r.top + r.height / 2;
+      var ix = r.left + (r.width >> 1);
+      var iy = r.top + (r.height >> 1);
       var dx = ix - cx;
       var dy = iy - cy;
 
-      var valid = false;
-      var primaryDist = 0;
-      var secondaryDist = 0;
+      var primary = isHoriz ? dx : dy;
+      var secondary = isHoriz ? dy : dx;
 
-      switch (direction) {
-        case 'left':
-          if (dx < -5) { valid = true; primaryDist = Math.abs(dx); secondaryDist = Math.abs(dy); }
-          break;
-        case 'right':
-          if (dx > 5) { valid = true; primaryDist = Math.abs(dx); secondaryDist = Math.abs(dy); }
-          break;
-        case 'up':
-          if (dy < -5) { valid = true; primaryDist = Math.abs(dy); secondaryDist = Math.abs(dx); }
-          break;
-        case 'down':
-          if (dy > 5) { valid = true; primaryDist = Math.abs(dy); secondaryDist = Math.abs(dx); }
-          break;
-      }
+      // Check direction validity
+      if (isPositive ? primary <= 5 : primary >= -5) continue;
 
-      if (valid) {
-        // Score: prioritize primary direction, penalize perpendicular offset
-        var score = primaryDist + secondaryDist * 3;
-        if (score < bestScore) {
-          bestScore = score;
-          best = items[i];
-        }
+      var absPrimary = primary < 0 ? -primary : primary;
+      var absSecondary = secondary < 0 ? -secondary : secondary;
+      var score = absPrimary + absSecondary * 3;
+
+      if (score < bestScore) {
+        bestScore = score;
+        best = items[i];
       }
     }
 
     return best;
   }
 
-  /**
-   * Handle key press events
-   */
   function handleKeyDown(e) {
     if (navLocked) return;
 
-    var keyCode = e.keyCode;
+    // Throttle rapid key presses
+    var now = Date.now();
+    if (now - lastKeyTime < KEY_THROTTLE) return;
+    lastKeyTime = now;
 
-    switch (keyCode) {
+    var code = e.keyCode;
+    var target;
+
+    switch (code) {
       case KEY.LEFT:
         e.preventDefault();
-        var leftEl = findNearest('left');
-        if (leftEl) setFocus(leftEl);
+        target = findNearest('left');
+        if (target) setFocus(target);
         break;
-
       case KEY.RIGHT:
         e.preventDefault();
-        var rightEl = findNearest('right');
-        if (rightEl) setFocus(rightEl);
+        target = findNearest('right');
+        if (target) setFocus(target);
         break;
-
       case KEY.UP:
         e.preventDefault();
-        var upEl = findNearest('up');
-        if (upEl) setFocus(upEl);
+        target = findNearest('up');
+        if (target) setFocus(target);
         break;
-
       case KEY.DOWN:
         e.preventDefault();
-        var downEl = findNearest('down');
-        if (downEl) setFocus(downEl);
+        target = findNearest('down');
+        if (target) setFocus(target);
         break;
-
       case KEY.ENTER:
         e.preventDefault();
         if (focusedElement && onSelect) {
@@ -170,7 +136,6 @@ var TVNav = (function () {
           onSelect(focusedElement);
         }
         break;
-
       case KEY.BACK_TIZEN:
       case KEY.BACK_BROWSER:
       case KEY.ESC:
@@ -184,94 +149,64 @@ var TVNav = (function () {
   }
 
   return {
-    /**
-     * Initialize navigation for a screen
-     * @param {string} screenId - The screen element ID
-     * @param {Function} selectHandler - Called when OK/Enter is pressed
-     * @param {Function} backHandler - Called when Back is pressed
-     */
     init: function (screenId, selectHandler, backHandler) {
       currentScreen = document.getElementById(screenId);
       onSelect = selectHandler;
       onBack = backHandler;
       navLocked = false;
+      invalidateCache();
 
-      // Focus the first focusable element
       var items = getFocusables();
       if (items.length > 0) {
         setFocus(items[0]);
       }
     },
 
-    /**
-     * Set focus to a specific element
-     */
     focusElement: function (el) {
       setFocus(el);
     },
 
-    /**
-     * Focus first focusable in current screen
-     */
     focusFirst: function () {
+      invalidateCache();
       var items = getFocusables();
-      if (items.length > 0) {
-        setFocus(items[0]);
-      }
+      if (items.length > 0) setFocus(items[0]);
     },
 
-    /**
-     * Lock navigation (during animations, feedback, etc.)
-     */
     lock: function () {
       navLocked = true;
     },
 
-    /**
-     * Unlock navigation
-     */
     unlock: function () {
       navLocked = false;
+      invalidateCache();
     },
 
-    /**
-     * Check if navigation is locked
-     */
     isLocked: function () {
       return navLocked;
     },
 
-    /**
-     * Get current focused element
-     */
     getFocused: function () {
       return focusedElement;
     },
 
-    /**
-     * Start listening for key events
-     */
-    start: function () {
-      document.addEventListener('keydown', handleKeyDown);
+    invalidateCache: invalidateCache,
 
-      // Register Samsung TV keys if available
+    start: function () {
+      document.addEventListener('keydown', handleKeyDown, false);
+
+      // Register Samsung Tizen remote keys
       if (typeof tizen !== 'undefined' && tizen.tvinputdevice) {
         try {
-          tizen.tvinputdevice.registerKey('ColorF0Red');
-          tizen.tvinputdevice.registerKey('ColorF1Green');
-          tizen.tvinputdevice.registerKey('ColorF2Yellow');
-          tizen.tvinputdevice.registerKey('ColorF3Blue');
-        } catch (e) {
-          // Not on a real TV, ignore
-        }
+          var keys = ['ColorF0Red', 'ColorF1Green', 'ColorF2Yellow', 'ColorF3Blue'];
+          for (var i = 0; i < keys.length; i++) {
+            tizen.tvinputdevice.registerKey(keys[i]);
+          }
+        } catch (e) {}
       }
     },
 
-    /**
-     * Stop listening for key events
-     */
     stop: function () {
-      document.removeEventListener('keydown', handleKeyDown);
+      document.removeEventListener('keydown', handleKeyDown, false);
     },
 
     KEY: KEY

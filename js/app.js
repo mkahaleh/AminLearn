@@ -1,5 +1,5 @@
 /**
- * Science Game - App Controller v2.0
+ * AminLearn - App Controller v2.0
  * Optimized: cached DOM, DocumentFragment batch ops, event delegation
  */
 var App = (function () {

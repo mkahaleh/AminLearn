@@ -1,5 +1,5 @@
 /**
- * Science Game - Samsung TV D-pad Navigation v2.0
+ * AminLearn - Samsung TV D-pad Navigation v2.0
  * Performance: input throttling, cached DOM lookups, passive listeners
  * Samsung TV Remote Key Codes:
  *   Arrows: 37/38/39/40, Enter: 13, Back: 10009 (Tizen) / 8,27 (browser)

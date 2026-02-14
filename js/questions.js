@@ -1,5 +1,5 @@
 /**
- * Science Game - Grade 3 Question Bank
+ * AminLearn - Grade 3 Question Bank
  * 6 Topics x 10 Questions each = 60 total questions
  * Each question has: text, options (4), correct index, explanation, optional visual hint
  */

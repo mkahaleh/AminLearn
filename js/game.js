@@ -1,5 +1,5 @@
 /**
- * Science Game - Game Engine v2.0
+ * AminLearn - Game Engine v2.0
  * Performance: RAF-based smooth timer, cached DOM refs, batch updates
  */
 var GameEngine = (function () {
@@ -144,14 +144,14 @@ var GameEngine = (function () {
   // ---------- Persistence ----------
   function loadProgress() {
     try {
-      var d = localStorage.getItem('scienceGameProgress');
+      var d = localStorage.getItem('aminLearnProgress');
       if (d) state.topicStars = JSON.parse(d);
     } catch (e) { state.topicStars = {}; }
   }
 
   function saveProgress() {
     try {
-      localStorage.setItem('scienceGameProgress', JSON.stringify(state.topicStars));
+      localStorage.setItem('aminLearnProgress', JSON.stringify(state.topicStars));
     } catch (e) {}
   }
 

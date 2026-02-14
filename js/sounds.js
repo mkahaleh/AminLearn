@@ -1,5 +1,5 @@
 /**
- * Science Game - Sound Engine v2.0
+ * AminLearn - Sound Engine v2.0
  * Web Audio API with node pooling and pre-scheduled timing
  */
 var SoundEngine = (function () {

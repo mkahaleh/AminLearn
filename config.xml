@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <widget xmlns="http://www.w3.org/ns/widgets" xmlns:tizen="http://tizen.org/ns/widgets"
-  id="http://sciencegame.example.com" version="1.0.0" viewmodes="maximized">
-  <tizen:application id="aBcDeFgHiJ.ScienceGame" package="aBcDeFgHiJ" required_version="2.3"/>
+  id="http://aminlearn.example.com" version="1.0.0" viewmodes="maximized">
+  <tizen:application id="aBcDeFgHiJ.AminLearn" package="aBcDeFgHiJ" required_version="2.3"/>
   <content src="index.html"/>
   <feature name="http://tizen.org/feature/screen.size.normal"/>
   <icon src="images/icon.png"/>
-  <name>Science Game</name>
+  <name>AminLearn</name>
   <tizen:privilege name="http://tizen.org/privilege/tv.audio"/>
   <tizen:profile name="tv-samsung"/>
   <tizen:metadata key="http://samsung.com/tv/metadata/prelaunch.support" value="true"/>

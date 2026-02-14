@@ -1,5 +1,5 @@
 /* ============================================================
-   SCIENCE GAME - Samsung TV Optimized Styles v2.0
+   AMINLEARN - Samsung TV Optimized Styles v2.0
    Resolution: 1920x1080 (Full HD TV standard)
    Safe Zone: 90% (5% margin on all sides for TV overscan)
    Font Size: Minimum 28px for 10-foot UI readability
@@ -149,6 +149,13 @@ html, body {
 .atom-icon, .atom-icon-sm {
   width: 100%;
   height: 100%;
+}
+
+.app-icon-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: var(--radius-lg);
 }
 
 .orbit {
